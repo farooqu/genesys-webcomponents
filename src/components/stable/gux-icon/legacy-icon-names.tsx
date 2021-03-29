@@ -1,4 +1,4 @@
-export const oldIconNames: string[] = [
+export const legacyIconNames: string[] = [
   'add-user',
   'align-center',
   'align-left',

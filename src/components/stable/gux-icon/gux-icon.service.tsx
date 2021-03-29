@@ -1,7 +1,7 @@
 import { getAssetPath } from '@stencil/core';
 
 import { iconNameMap } from './icon-name-map';
-import { oldIconNames } from './old-icon-names';
+import { legacyIconNames } from './legacy-icon-names';
 
 const svgHTMLCache: Map<string, Promise<string>> = new Map();
 
@@ -12,18 +12,8 @@ async function fetchIcon(iconName: string): Promise<string> {
     return iconResponse.text();
   }
 
-  console.error(
-    `[gux-icon] fetching failed for icon "${iconName}" with status "${iconResponse.statusText} (${iconResponse.status})".`
-  );
-
-  const unknownIconResponse = await fetch(getAssetPath(`./icons/unknown.svg`));
-
-  if (unknownIconResponse.status === 200) {
-    return unknownIconResponse.text();
-  }
-
   throw new Error(
-    `[gux-icon] fetching failed for icon "${this.iconName}" and fallback unknown icon".`
+    `[gux-icon] fetching failed for icon "${iconName}" with status "${iconResponse.statusText} (${iconResponse.status})".`
   );
 }
 
@@ -40,8 +30,8 @@ export function getRootIconName(iconName: string): string {
     return iconNameMap[iconName];
   }
 
-  if (oldIconNames.includes(iconName)) {
-    return `old/${iconName}`;
+  if (legacyIconNames.includes(iconName)) {
+    return `legacy/${iconName}`;
   }
 
   return iconName;
@@ -79,7 +69,8 @@ export function getSvgHtml(
       setTimeout(() => {
         throw err;
       }, 0);
-      return null;
+
+      return getSvgHtml('unknown', decorative, screenreaderText);
     });
 
   svgHTMLCache.set(id, svgHtml);
