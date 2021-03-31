@@ -649,7 +649,7 @@ export class GuxDatepicker {
                 }}
                 tabindex="-1"
               >
-                <gux-icon decorative iconName="ic-calendar-generic"></gux-icon>
+                <gux-icon decorative icon-name="calendar"></gux-icon>
               </button>
               <gux-calendar
                 ref={(el: HTMLGuxCalendarElement) =>
@@ -690,10 +690,7 @@ export class GuxDatepicker {
                   }}
                   tabindex="-1"
                 >
-                  <gux-icon
-                    decorative
-                    iconName="ic-calendar-generic"
-                  ></gux-icon>
+                  <gux-icon decorative icon-name="calendar"></gux-icon>
                 </button>
               </gux-text-field-legacy>
             </gux-text-label>

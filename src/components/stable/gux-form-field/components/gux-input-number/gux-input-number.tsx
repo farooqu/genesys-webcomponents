@@ -73,7 +73,7 @@ export class GuxInputNumber {
           disabled={this.disabled}
           onClick={this.clearInput.bind(this)}
         >
-          <gux-icon iconName="ic-close" decorative></gux-icon>
+          <gux-icon icon-name="close" decorative></gux-icon>
         </button>
       );
     }
@@ -91,7 +91,7 @@ export class GuxInputNumber {
           disabled={this.disabled}
           onClick={() => this.stepUp()}
         >
-          <gux-icon iconName="angle-up" decorative></gux-icon>
+          <gux-icon icon-name="chevron-sm-up" decorative></gux-icon>
         </button>
 
         <button
@@ -101,7 +101,7 @@ export class GuxInputNumber {
           disabled={this.disabled}
           onClick={() => this.stepDown()}
         >
-          <gux-icon iconName="angle-down" decorative></gux-icon>
+          <gux-icon icon-name="chevron-sm-down" decorative></gux-icon>
         </button>
       </div>
     );
