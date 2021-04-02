@@ -1,0 +1,51 @@
+<h1>Cursor</h1>
+<div lang="en">
+  <div class="table-placeholder"></div>
+  <gux-cursor-pagination-beta></gux-cursor-pagination-beta>
+</div>
+
+<h1>Cursor</h1>
+<div lang="en">
+  <div class="table-placeholder"></div>
+  <gux-cursor-pagination-beta has-next></gux-cursor-pagination-beta>
+</div>
+
+<h1>Cursor</h1>
+<div lang="en">
+  <div class="table-placeholder"></div>
+  <gux-cursor-pagination-beta
+    has-previous
+    has-next
+  ></gux-cursor-pagination-beta>
+</div>
+
+<h1>Cursor</h1>
+<div lang="en">
+  <div class="table-placeholder"></div>
+  <gux-cursor-pagination-beta has-previous></gux-cursor-pagination-beta>
+</div>
+
+<style>
+  .table-placeholder {
+    padding: 10px;
+    color: #f1f1f1;
+    text-align: center;
+    background-image: linear-gradient(
+      45deg,
+      #f1f1f1 25%,
+      transparent 25%,
+      transparent 50%,
+      #f1f1f1 50%,
+      #f1f1f1 75%,
+      transparent 75%,
+      #fff
+    );
+    background-size: 5px 5px;
+  }
+
+  .table-placeholder::before {
+    padding: 5px;
+    content: 'Table Placeholder';
+    background-color: white;
+  }
+</style>

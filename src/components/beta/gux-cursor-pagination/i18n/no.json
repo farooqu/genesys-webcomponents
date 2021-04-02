@@ -1,0 +1,8 @@
+{
+  "page": "Side",
+  "totalPages": " av {totalPages, number}",
+  "first": "Første",
+  "previous": "Forrige",
+  "next": "Neste",
+  "last": "Siste"
+}

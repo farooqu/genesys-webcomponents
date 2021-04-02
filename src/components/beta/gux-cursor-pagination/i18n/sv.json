@@ -1,0 +1,8 @@
+{
+  "page": "Sida",
+  "totalPages": " av {totalPages, number}",
+  "first": "Förnamn",
+  "previous": "Föregående",
+  "next": "Nästa",
+  "last": "Efternamn"
+}

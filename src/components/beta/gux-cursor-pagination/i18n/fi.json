@@ -1,0 +1,8 @@
+{
+  "page": "Sivu",
+  "totalPages": " / {totalPages, number}",
+  "first": "Etunimi",
+  "previous": "Edellinen",
+  "next": "Seuraava",
+  "last": "Sukunimi"
+}

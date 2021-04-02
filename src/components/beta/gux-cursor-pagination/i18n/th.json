@@ -1,0 +1,8 @@
+{
+  "page": "หน้า",
+  "totalPages": " จาก {totalPages, number}",
+  "first": "ที่ 1",
+  "previous": "ก่อนหน้า",
+  "next": "ถัดไป",
+  "last": "สุดท้าย"
+}

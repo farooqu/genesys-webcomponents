@@ -1,0 +1,8 @@
+{
+  "page": "Sayfa",
+  "totalPages": " / {totalPages, number}",
+  "first": "Birinci",
+  "previous": "Önceki",
+  "next": "Sonraki",
+  "last": "Son"
+}

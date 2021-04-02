@@ -1,0 +1,8 @@
+{
+  "page": "Страница",
+  "totalPages": " из {totalPages, number}",
+  "first": "Первая",
+  "previous": "Предыдущая",
+  "next": "Следующая",
+  "last": "Последняя"
+}
