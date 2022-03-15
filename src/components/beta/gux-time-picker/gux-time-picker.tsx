@@ -4,14 +4,20 @@ import {
   Event,
   EventEmitter,
   h,
+  JSX,
   Listen,
   Prop,
   State,
   Watch
 } from '@stencil/core';
 
+import { OnClickOutside } from '../../../utils/decorator/on-click-outside';
 import { fromIsoTime } from '../../../utils/date/from-iso-time-string';
 import { trackComponent } from '../../../usage-tracking';
+
+import { buildI18nForComponent, GetI18nValue } from '../../../i18n';
+
+import translationResources from './i18n/en.json';
 
 const MAX_TIME: string = '23:59:59';
 const MIN_TIME: string = '00:00:00';
@@ -19,9 +25,12 @@ const DEFAULT_INTERVAL: number = 15;
 
 @Component({
   styleUrl: 'gux-time-picker.less',
-  tag: 'gux-time-picker-beta'
+  tag: 'gux-time-picker-beta',
+  shadow: true
 })
 export class GuxTimePicker {
+  private i18n: GetI18nValue;
+
   @Element()
   root: HTMLElement;
 
@@ -37,6 +46,9 @@ export class GuxTimePicker {
   @Prop({ mutable: true })
   min: string = MIN_TIME;
 
+  @Prop()
+  label: string = '';
+
   @State()
   active: boolean = false;
 
@@ -47,7 +59,7 @@ export class GuxTimePicker {
   suggestion: string = '00';
 
   @Event()
-  changed: EventEmitter<any>;
+  changed: EventEmitter<string>;
 
   inputElement: HTMLInputElement;
   focusedField: HTMLInputElement;
@@ -57,28 +69,35 @@ export class GuxTimePicker {
   isPressEvent: boolean = false;
 
   @Watch('value')
-  watchValue(newValue) {
+  watchValue(newValue: string) {
     this.changed.emit(newValue);
+  }
+
+  private getShadowDomEventTarget(event: Event): EventTarget {
+    return event.composedPath()[0];
   }
 
   @Listen('keydown', { passive: false })
   onKeyDown(e: KeyboardEvent) {
-    this.focusedField = e.target as HTMLInputElement;
+    this.focusedField = this.getShadowDomEventTarget(e) as HTMLInputElement;
+
     if (this.focusedField === this.inputElement) {
       switch (e.key) {
         case 'Enter':
-        case 'Escape':
-          this.focusedField.blur();
+          this.updateChosenValue();
+          this.inputElement.focus();
           break;
         case 'Backspace':
           e.preventDefault();
           this.handleBackspace();
           break;
         case 'Tab':
+          this.updateChosenValue();
           break;
         case 'ArrowDown':
+          e.preventDefault();
           if (this.dropdownList) {
-            this.dropdownList.setFocusOnFirstItem();
+            void this.dropdownList.setFocusOnFirstItem();
           }
           break;
         case 'ArrowUp':
@@ -91,7 +110,8 @@ export class GuxTimePicker {
           if ('0' <= e.key && e.key <= '9') {
             this.openDropdown = true;
             if (this.focusedField.value.length < 8) {
-              let newValue = this.focusedField.value + parseInt(e.key, 10);
+              let newValue =
+                this.focusedField.value + String(parseInt(e.key, 10));
               const arr = newValue.split(':');
               if (newValue.length > 6 && Number(arr[2].padEnd(2, '0')) > 59) {
                 return;
@@ -106,6 +126,16 @@ export class GuxTimePicker {
               this.suggestion = arr[0].padEnd(2, '0');
             }
           }
+      }
+    } else {
+      switch (e.key) {
+        case 'Enter':
+          this.inputElement.focus();
+          break;
+        case 'Escape':
+          this.updateChosenValue();
+          this.inputElement.focus();
+          break;
       }
     }
   }
@@ -136,17 +166,17 @@ export class GuxTimePicker {
   @Listen('press', { passive: false })
   onPress(e: CustomEvent) {
     this.isPressEvent = true;
-    const chosenTimeOption = e.target as HTMLGuxListItemElement;
-    this.inputElement.value = chosenTimeOption.value;
+
+    const chosenTimeOption = this.getShadowDomEventTarget(
+      e
+    ) as HTMLGuxListItemElement;
+    this.inputElement.value = chosenTimeOption.value as string;
     this.updateChosenValue();
   }
 
-  @Listen('focusout')
-  onFocusOut(e: FocusEvent) {
-    if (!this.isPressEvent && !this.root.contains(e.relatedTarget as Node)) {
-      this.updateChosenValue();
-    }
-    this.isPressEvent = false;
+  @OnClickOutside({ triggerEvents: 'mousedown' })
+  onClickOutside() {
+    this.updateChosenValue();
   }
 
   updateChosenValue() {
@@ -158,7 +188,7 @@ export class GuxTimePicker {
 
   @Listen('mouseup')
   onMouseUp(e: MouseEvent) {
-    this.focusedField = e.target as HTMLInputElement;
+    this.focusedField = this.getShadowDomEventTarget(e) as HTMLInputElement;
     if (this.focusedField === this.inputElement) {
       if (this.focusedField.selectionEnd !== this.inputElement.value.length) {
         this.inputElement.setSelectionRange(0, this.inputElement.value.length);
@@ -173,7 +203,7 @@ export class GuxTimePicker {
 
   @Listen('focusin')
   onFocusIn(e: FocusEvent) {
-    this.focusedField = e.target as HTMLInputElement;
+    this.focusedField = this.getShadowDomEventTarget(e) as HTMLInputElement;
     this.active = true;
   }
 
@@ -227,8 +257,9 @@ export class GuxTimePicker {
     return validatedValue;
   }
 
-  componentWillLoad() {
+  async componentWillLoad(): Promise<void> {
     trackComponent(this.root);
+    this.i18n = await buildI18nForComponent(this.root, translationResources);
     this.validateBounds();
     this.value = this.validateValue(this.value);
   }
@@ -238,7 +269,7 @@ export class GuxTimePicker {
     return regex.test(value);
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <div>
         <div class="gux-input">
@@ -246,7 +277,7 @@ export class GuxTimePicker {
             type="text"
             value={this.value}
             size={9}
-            class={this.active ? 'gux-focused' : ''}
+            aria-label={this.label || this.i18n('defaultAriaLabel')}
             ref={el => (this.inputElement = el)}
           ></input>
         </div>
@@ -256,13 +287,13 @@ export class GuxTimePicker {
               {this.buildDropdownOptions().map(value => {
                 return (
                   <gux-list-item value={value} text={value}></gux-list-item>
-                );
+                ) as JSX.Element;
               })}
             </gux-list>
           </div>
         )}
       </div>
-    );
+    ) as JSX.Element;
   }
 
   buildDropdownOptions(): string[] {

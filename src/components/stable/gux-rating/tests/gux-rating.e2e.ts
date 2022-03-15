@@ -1,8 +1,6 @@
 import { E2EPage } from '@stencil/core/testing';
 import { newSparkE2EPage, a11yCheck } from '../../../../../tests/e2eTestUtils';
 
-const axeExclusions = [];
-
 describe('gux-rating', () => {
   async function getStarCounts(
     page: E2EPage
@@ -97,7 +95,7 @@ describe('gux-rating', () => {
         const page = await newSparkE2EPage({ html });
 
         const element = await page.find('gux-rating');
-        await a11yCheck(page, axeExclusions);
+        await a11yCheck(page);
 
         expect(element).toBeDefined();
         expect(await getStarCounts(page)).toEqual(expectedStarCounts);
@@ -119,7 +117,7 @@ describe('gux-rating', () => {
           const starElements = starContainer.children;
           const ratingElement = starElements[
             ratingElementIndex
-          ].shadowRoot.querySelector('.gux-icon-container') as HTMLElement;
+          ].shadowRoot.querySelector('.gux-icon-container');
 
           ratingElement.click();
         }, position - 1);
@@ -141,7 +139,7 @@ describe('gux-rating', () => {
         { starToClick: 3 },
         { starToClick: 4 },
         { starToClick: 5 }
-      ].forEach(({ starToClick }, index) => {
+      ].forEach(({ starToClick }) => {
         it(`should render 0 if star ${starToClick} is clicked but the component is disabled`, async () => {
           page = await newSparkE2EPage({
             html: '<gux-rating disabled aria-label="Feedback"></gux-rating>'

@@ -1,11 +1,5 @@
 import { newSparkE2EPage, a11yCheck } from '../../../../../tests/e2eTestUtils';
 
-const axeExclusions = [];
-
-function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 describe('gux-tooltip', () => {
   describe('#render', () => {
     [
@@ -27,7 +21,7 @@ describe('gux-tooltip', () => {
 
         const element = await page.find('#element');
         const tooltip = await page.find('gux-tooltip');
-        await a11yCheck(page, axeExclusions);
+        await a11yCheck(page);
 
         expect(element.getAttribute('aria-describedby')).toBe(tooltip.id);
         expect(tooltip.getAttribute('data-popper-placement')).toBe(

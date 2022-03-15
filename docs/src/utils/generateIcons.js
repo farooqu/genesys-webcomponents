@@ -1,5 +1,3 @@
-const { removeDisabledFailures } = require('tslint');
-
 const icons = [
   { sectionName: 'Agent', iconNames: ['agent', 'agent-circle', 'agent-group'] },
   {
@@ -23,6 +21,7 @@ const icons = [
   {
     sectionName: 'Faces',
     iconNames: [
+      'face-empathy',
       'face-happy',
       'face-happy-solid',
       'face-neutral',
@@ -111,6 +110,7 @@ const icons = [
       'phone-inbound',
       'phone-missed-call',
       'phone-outbound',
+      'phone-success',
       'phone-voice',
       'voicemail'
     ]
@@ -154,6 +154,7 @@ const icons = [
       'attachment',
       'inbox',
       'message-email',
+      'message-email-outbound',
       'message-forward',
       'message-reply',
       'message-reply-all',
@@ -239,6 +240,7 @@ const icons = [
       'archive',
       'clipboard',
       'clipboard-error',
+      'clipboard-success',
       'clone',
       'copy',
       'cut',
@@ -281,6 +283,7 @@ const icons = [
       'dash',
       'fax',
       'fire',
+      'flag',
       'follow',
       'generic',
       'low-bandwidth',
@@ -293,6 +296,7 @@ const icons = [
       'quote-left',
       'quote-right',
       'resource',
+      'run',
       'scripter',
       'skills',
       'stamp',
@@ -312,6 +316,7 @@ const icons = [
       'key',
       'link',
       'lock',
+      'lock-hold',
       'moon',
       'settings',
       'sun',
@@ -329,6 +334,8 @@ const icons = [
   {
     sectionName: 'Social Media',
     iconNames: [
+      '8x8',
+      '8x8-alt',
       'android',
       'apple',
       'at',
@@ -342,8 +349,8 @@ const icons = [
       'line-messenger',
       'linkedin',
       'linux',
-      'microsoft-teams',
       'microsoft',
+      'microsoft-teams',
       'opera',
       'retweet',
       'rss',
@@ -416,12 +423,15 @@ const icons = [
       'arrow-solid-right',
       'arrow-solid-up',
       'calendar',
+      'calendar-add',
       'checkbox',
       'checkbox-active',
       'checkbox-partial',
       'checkmark',
+      'chevron-double-down',
       'chevron-double-left',
       'chevron-double-right',
+      'chevron-double-up',
       'chevron-small-down',
       'chevron-small-left',
       'chevron-small-right',
@@ -442,6 +452,7 @@ const icons = [
       'rating-active',
       'rating-partial',
       'search',
+      'subtract',
       'tag',
       'tag-add',
       'tag-remove'

@@ -1,4 +1,6 @@
-import { Component, Element, h, Host, JSX, Prop, Watch } from '@stencil/core';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
+import { Component, Element, h, JSX, Prop, Watch } from '@stencil/core';
 import { EmbedOptions, VisualizationSpec } from 'vega-embed';
 
 import { trackComponent } from '../../../usage-tracking';
@@ -10,7 +12,8 @@ import { logError } from '../../../utils/error/log-error';
 const DEFAULT_COLOR_FIELD_NAME = 'category';
 @Component({
   styleUrl: 'gux-chart-line.less',
-  tag: 'gux-chart-line-beta'
+  tag: 'gux-chart-line-beta',
+  shadow: true
 })
 export class GuxLineChart {
   @Element()
@@ -18,6 +21,7 @@ export class GuxLineChart {
 
   private visualizationSpec: VisualizationSpec;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private baseChartSpec: Record<string, any> = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     mark: {
@@ -26,6 +30,13 @@ export class GuxLineChart {
       point: false
     },
     config: {
+      axis: {
+        ticks: false,
+        titlePadding: 8
+      },
+      axisX: {
+        labelAngle: 0
+      },
       legend: {
         symbolType: 'circle'
       }
@@ -48,10 +59,29 @@ export class GuxLineChart {
    * Data field names must match the values you set in xFieldName and yFieldName
    */
   @Prop()
-  chartData: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chartData: Record<string, any>;
+
+  /**
+   * If true, then make Axis tick label 45 degrees
+   */
+  @Prop()
+  xTickLabelSlant: boolean;
 
   @Prop()
   includeLegend: boolean;
+
+  @Prop()
+  legendPosition:
+    | 'left'
+    | 'right'
+    | 'top'
+    | 'bottom'
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right'
+    | 'none' = 'right';
 
   @Prop()
   includeDataPointMarkers: boolean;
@@ -114,8 +144,16 @@ export class GuxLineChart {
       chartData = { data: this.chartData };
     }
 
+    if (this.xTickLabelSlant) {
+      this.baseChartSpec.config.axisX.labelAngle = 45;
+    }
+
     if (this.includeLegend) {
       this.baseChartSpec.encoding.color.legend = true;
+    }
+
+    if (this.legendPosition) {
+      this.baseChartSpec.config.legend.orient = this.legendPosition;
     }
 
     const xFieldName = this.xFieldName;
@@ -171,18 +209,16 @@ export class GuxLineChart {
     this.visualizationSpec = spec;
   }
 
-  async componentWillRender(): Promise<void> {
+  componentWillLoad(): void {
     trackComponent(this.root);
     this.parseData();
   }
 
   render(): JSX.Element {
     return (
-      <Host>
-        <gux-visualization-beta
-          visualizationSpec={this.visualizationSpec}
-        ></gux-visualization-beta>
-      </Host>
-    );
+      <gux-visualization-beta
+        visualizationSpec={this.visualizationSpec}
+      ></gux-visualization-beta>
+    ) as JSX.Element;
   }
 }

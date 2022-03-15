@@ -1,7 +1,5 @@
 import { newSparkE2EPage, a11yCheck } from '../../../../../tests/e2eTestUtils';
 
-const axeExclusions = [];
-
 describe('gux-popover', () => {
   it('renders', async () => {
     const page = await newSparkE2EPage({
@@ -18,7 +16,7 @@ describe('gux-popover', () => {
     });
 
     const element = await page.find('gux-popover');
-    await a11yCheck(page, axeExclusions);
+    await a11yCheck(page);
     expect(element).toHaveClass('hydrated');
   });
 
@@ -38,7 +36,7 @@ describe('gux-popover', () => {
 
     const component = await page.find('gux-popover');
     const guxdismiss = await component.spyOnEvent('guxdismiss');
-    const button = await page.find('gux-dismiss-button');
+    const button = await page.find('pierce/gux-dismiss-button');
     await button.click();
     expect(guxdismiss).toHaveReceivedEvent();
   });
@@ -60,8 +58,8 @@ describe('gux-popover', () => {
     const component = await page.find('gux-popover');
     component.setProperty('displayDismissDutton', false);
     await page.waitForChanges();
-    const button = await page.find('gux-dismiss-button-beta');
-    await a11yCheck(page, axeExclusions);
+    const button = await page.find('pierce/gux-dismiss-button');
+    await a11yCheck(page);
     expect(button).toBeNull();
   });
 });

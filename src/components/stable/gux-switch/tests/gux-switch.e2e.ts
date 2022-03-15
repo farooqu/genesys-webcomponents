@@ -1,7 +1,5 @@
 import { newSparkE2EPage, a11yCheck } from '../../../../../tests/e2eTestUtils';
 
-const axeExclusions = [];
-
 describe('gux-switch', () => {
   const html = `
   <gux-switch lang-"en" layout="small" value="day">
@@ -16,7 +14,7 @@ describe('gux-switch', () => {
     it(`should render as expected`, async () => {
       const page = await newSparkE2EPage({ html });
       const element = await page.find('gux-switch');
-      await a11yCheck(page, axeExclusions);
+      await a11yCheck(page);
 
       expect(element.outerHTML).toMatchSnapshot();
     });
@@ -32,7 +30,7 @@ describe('gux-switch', () => {
 
       expect(await element.getProperty('value')).toBe('day');
 
-      guxSwitchItemMinute.click();
+      await guxSwitchItemMinute.click();
       await page.waitForChanges();
 
       expect(await element.getProperty('value')).toBe(
@@ -48,7 +46,7 @@ describe('gux-switch', () => {
 
       expect(currentValue).toBe('day');
 
-      guxSwitchItemHour.click();
+      await guxSwitchItemHour.click();
       await page.waitForChanges();
 
       expect(await element.getProperty('value')).toBe(currentValue);
@@ -64,7 +62,7 @@ describe('gux-switch', () => {
       const spyOnInputEvent = await element.spyOnEvent('input');
       const spyOnChangeEvent = await element.spyOnEvent('change');
 
-      guxSwitchItemMinute.click();
+      await guxSwitchItemMinute.click();
       await page.waitForChanges();
 
       expect(spyOnInputEvent.length).toBe(1);
@@ -79,7 +77,7 @@ describe('gux-switch', () => {
       const spyOnInputEvent = await element.spyOnEvent('input');
       const spyOnChangeEvent = await element.spyOnEvent('change');
 
-      guxSwitchItemHour.click();
+      await guxSwitchItemHour.click();
       await page.waitForChanges();
 
       expect(spyOnInputEvent.length).toBe(0);
@@ -106,10 +104,9 @@ describe('gux-switch', () => {
           'gux-switch-item[value=week]'
         );
 
-        const template = document.createElement('template');
-        template.innerHTML =
-          '<gux-switch-item value="month">Month</gux-switch-item>';
-        const monthElement = template.content.firstChild as Element;
+        const monthElement = document.createElement('gux-switch-item');
+        monthElement.appendChild(document.createTextNode('Month'));
+        monthElement.setAttribute('value', 'month');
 
         weekElement.insertAdjacentElement('beforebegin', monthElement);
       });

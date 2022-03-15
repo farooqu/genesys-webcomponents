@@ -1,6 +1,6 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { GuxActionButton } from '../gux-action-button';
-import { GuxActionItem } from '../gux-action-item/gux-action-item';
+import { GuxActionItem } from '../../../beta/gux-action-list/gux-action-item/gux-action-item';
 
 const components = [GuxActionButton, GuxActionItem];
 const html = `
@@ -36,7 +36,7 @@ describe('gux-action-button', () => {
     const element = document.querySelector('gux-action-button');
     const actionButton = element.shadowRoot.querySelector(
       '.gux-action-button > button'
-    ) as HTMLButtonElement;
+    );
 
     actionButton.click();
 
@@ -61,7 +61,7 @@ describe('gux-action-button', () => {
     const element = document.querySelector('gux-action-button');
     const actionButton = element.shadowRoot.querySelector(
       '.gux-action-button > button'
-    ) as HTMLButtonElement;
+    );
 
     actionButton.click();
 
@@ -79,7 +79,7 @@ describe('gux-action-button', () => {
     const element = document.querySelector('gux-action-button');
     const dropdownButton = element.shadowRoot.querySelector(
       '.gux-dropdown-button > button'
-    ) as HTMLButtonElement;
+    );
 
     dropdownButton.click();
     dropdownButton.click();
@@ -106,7 +106,7 @@ describe('gux-action-button', () => {
     const element = document.querySelector('gux-action-button');
     const dropdownButton = element.shadowRoot.querySelector(
       '.gux-dropdown-button > button'
-    ) as HTMLButtonElement;
+    );
 
     dropdownButton.click();
 

@@ -21,7 +21,8 @@ import { onDisabledChange } from '../../../utils/dom/on-attribute-change';
 
 @Component({
   styleUrl: 'gux-content-search.less',
-  tag: 'gux-content-search'
+  tag: 'gux-content-search',
+  shadow: true
 })
 export class GuxContentSearch {
   private inputSlottedElement: HTMLInputElement;
@@ -60,6 +61,7 @@ export class GuxContentSearch {
   /**
    * Clears the input.
    */
+  // eslint-disable-next-line @typescript-eslint/require-await
   @Method()
   async clear(): Promise<void> {
     if (this.disabled) {
@@ -84,23 +86,30 @@ export class GuxContentSearch {
         this.disabled = disabled;
       }
     );
-    this.inputSlottedElement.addEventListener('input', e => this.onInput(e));
+    this.inputSlottedElement.addEventListener('input', (e: InputEvent) =>
+      this.onInput(e)
+    );
   }
 
   disconnectedCallback(): void {
     this.disabledObserver.disconnect();
   }
 
-  render() {
+  render(): JSX.Element {
     return (
-      <div class={{ 'gux-disabled': this.disabled, 'gux-content': true }}>
+      <div
+        class={{
+          'gux-content-search': true,
+          'gux-disabled': this.disabled
+        }}
+      >
         <div class="gux-search-icon">
           <gux-icon decorative icon-name="search"></gux-icon>
         </div>
         <slot />
         {this.getNavigationPanel()}
       </div>
-    );
+    ) as JSX.Element;
   }
 
   private getNavigationPanel(): JSX.Element {
@@ -156,7 +165,7 @@ export class GuxContentSearch {
             <gux-icon decorative icon-name="close"></gux-icon>
           </button>
         </div>
-      );
+      ) as JSX.Element;
     }
 
     return null;
@@ -237,8 +246,8 @@ export class GuxContentSearch {
     this.emitCurrentMatchChanged();
   }
 
-  private onInput(event): void {
-    this.value = event.target.value;
+  private onInput(event: InputEvent): void {
+    this.value = (event.target as HTMLInputElement).value;
   }
 
   private emitCurrentMatchChanged(): void {

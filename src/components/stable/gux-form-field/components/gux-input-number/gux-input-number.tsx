@@ -67,6 +67,7 @@ export class GuxInputNumber {
       return (
         <button
           class="gux-clear-button"
+          tabIndex={-1}
           type="button"
           title={this.getI18nValue('clear')}
           disabled={this.disabled}
@@ -74,7 +75,7 @@ export class GuxInputNumber {
         >
           <gux-icon icon-name="close" decorative></gux-icon>
         </button>
-      );
+      ) as JSX.Element;
     }
 
     return null;
@@ -85,6 +86,7 @@ export class GuxInputNumber {
       <div class="gux-step-buttons-container">
         <button
           class="gux-step-button"
+          tabIndex={-1}
           type="button"
           title={this.getI18nValue('increment')}
           disabled={this.disabled}
@@ -95,6 +97,7 @@ export class GuxInputNumber {
 
         <button
           class="gux-step-button"
+          tabIndex={-1}
           type="button"
           title={this.getI18nValue('decrement')}
           disabled={this.disabled}
@@ -103,7 +106,7 @@ export class GuxInputNumber {
           <gux-icon icon-name="chevron-small-down" decorative></gux-icon>
         </button>
       </div>
-    );
+    ) as JSX.Element;
   }
 
   async componentWillLoad(): Promise<void> {
@@ -146,6 +149,6 @@ export class GuxInputNumber {
         </div>
         {this.renderStepButtons()}
       </div>
-    );
+    ) as JSX.Element;
   }
 }

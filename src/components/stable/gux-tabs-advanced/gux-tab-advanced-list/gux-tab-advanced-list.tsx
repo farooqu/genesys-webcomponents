@@ -27,7 +27,7 @@ import tabsResources from '../i18n/en.json';
 })
 export class GuxTabAdvancedList {
   private i18n: GetI18nValue;
-  private moveFocusDelay = 100;
+  private moveFocusDelay: number = 100;
   private triggerIds: string;
 
   @Element()
@@ -150,11 +150,7 @@ export class GuxTabAdvancedList {
 
   @OnMutation({ childList: true, subtree: true })
   onMutation(): void {
-    this.triggerIds = Array.from(
-      this.root.querySelector('.gux-scrollable-section').children
-    )
-      .map(trigger => `gux-${trigger.getAttribute('tab-id')}-tab`)
-      .join(' ');
+    this.setTabTriggers();
   }
 
   @Listen('keydown')
@@ -173,8 +169,8 @@ export class GuxTabAdvancedList {
           const targetNodeIndex = Array.prototype.indexOf.call(
             allNodes,
             this.sortTarget
-          );
-          let insertBeforeTab;
+          ) as number;
+          let insertBeforeTab: Node;
           if (targetNodeIndex === allNodes.length - 1) {
             insertBeforeTab = allNodes[0];
           } else {
@@ -333,12 +329,13 @@ export class GuxTabAdvancedList {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   @Method()
   async guxSetActive(activeTab: string): Promise<void> {
     this.tabTriggers.forEach((tabTrigger, index) => {
       const active = tabTrigger.tabId === activeTab;
 
-      tabTrigger.guxSetActive(active);
+      void tabTrigger.guxSetActive(active);
 
       if (active) {
         this.focused = index;
@@ -371,7 +368,18 @@ export class GuxTabAdvancedList {
         .querySelector('.gux-tab-options-button')
         .setAttribute('tabindex', '0');
     }
-    this.tabTriggers[this.focused].guxFocus();
+    void this.tabTriggers[this.focused].guxFocus();
+  }
+
+  private setTabTriggers(): void {
+    this.tabTriggers = this.root.querySelectorAll('gux-tab-advanced');
+    if (this.tabTriggers) {
+      this.triggerIds = Array.from(this.tabTriggers)
+        .map(trigger => `gux-${trigger.getAttribute('tab-id')}-tab`)
+        .join(' ');
+    } else {
+      this.triggerIds = '';
+    }
   }
 
   createSortable() {
@@ -470,7 +478,7 @@ export class GuxTabAdvancedList {
   }
 
   async componentWillLoad(): Promise<void> {
-    this.tabTriggers = this.root.querySelectorAll('gux-tab-advanced');
+    this.setTabTriggers();
     this.i18n = await buildI18nForComponent(this.root, tabsResources);
   }
 
@@ -480,8 +488,8 @@ export class GuxTabAdvancedList {
     }
 
     if (!this.resizeObserver && window.ResizeObserver) {
-      this.resizeObserver = new ResizeObserver(
-        this.checkForScrollbarHideOrShow.bind(this)
+      this.resizeObserver = new ResizeObserver(() =>
+        this.checkForScrollbarHideOrShow()
       );
     }
 
@@ -492,8 +500,8 @@ export class GuxTabAdvancedList {
     }
 
     if (!this.domObserver && window.MutationObserver) {
-      this.domObserver = new MutationObserver(
-        this.checkForScrollbarHideOrShow.bind(this)
+      this.domObserver = new MutationObserver(() =>
+        this.checkForScrollbarHideOrShow()
       );
     }
 
@@ -558,7 +566,7 @@ export class GuxTabAdvancedList {
         >
           <gux-icon icon-name="add" decorative={true} />
         </button>
-      );
+      ) as JSX.Element;
     };
     return [
       <span class="gux-sr-only gux-aria-live-region" aria-live="polite">
@@ -596,7 +604,7 @@ export class GuxTabAdvancedList {
           ) : null}
         </div>
       </div>
-    ];
+    ] as JSX.Element;
   }
 
   private renderScrollButton(direction: string): JSX.Element {
@@ -617,7 +625,7 @@ export class GuxTabAdvancedList {
           </button>
         ) : null}
       </div>
-    );
+    ) as JSX.Element;
   }
 
   private getScrollDirection(direction: string): void {

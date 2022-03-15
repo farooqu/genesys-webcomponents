@@ -10,7 +10,6 @@ import {
   writeTask
 } from '@stencil/core';
 
-import { OnMutation } from '../../../../utils/decorator/on-mutation';
 import { buildI18nForComponent, GetI18nValue } from '../../../../i18n';
 
 import tabsResources from '../i18n/en.json';
@@ -22,6 +21,7 @@ import tabsResources from '../i18n/en.json';
 })
 export class GuxTabList {
   private i18n: GetI18nValue;
+  private triggerIds: string;
 
   @Element()
   root: HTMLElement;
@@ -39,7 +39,10 @@ export class GuxTabList {
   private hasVerticalScrollbar: boolean = false;
 
   @State()
-  private triggerIds: string;
+  private isScrolledToBeginning: boolean = false;
+
+  @State()
+  private isScrolledToEnd: boolean = false;
 
   @Listen('focusout')
   onFocusout(event: FocusEvent) {
@@ -55,14 +58,19 @@ export class GuxTabList {
     }
   }
 
+  @Listen('hasVerticalScrollbar')
+  onHasVerticalScrollBar(): void {
+    this.checkDisabledScrollButtons();
+  }
+
+  @Listen('scroll', { capture: true })
+  onScroll(): void {
+    this.checkDisabledScrollButtons();
+  }
+
   private resizeObserver?: ResizeObserver;
 
   private domObserver?: MutationObserver;
-
-  @OnMutation({ childList: true, subtree: true })
-  onMutation(): void {
-    this.setTriggerIds();
-  }
 
   @Listen('keydown')
   onKeydown(event: KeyboardEvent): void {
@@ -80,6 +88,7 @@ export class GuxTabList {
       case 'Escape':
         event.preventDefault();
         this.focusTab(this.focused);
+        break;
       case 'Home':
         event.preventDefault();
         this.focusTab(0);
@@ -91,12 +100,13 @@ export class GuxTabList {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   @Method()
   async guxSetActive(activeTab: string): Promise<void> {
     this.tabTriggers.forEach((tabTrigger, index) => {
       const active = tabTrigger.tabId === activeTab;
 
-      tabTrigger.guxSetActive(active);
+      void tabTrigger.guxSetActive(active);
 
       if (active) {
         this.focused = index;
@@ -115,10 +125,11 @@ export class GuxTabList {
     this.tabTriggers[this.focused]
       .querySelector('button')
       .setAttribute('tabindex', '0');
-    this.tabTriggers[this.focused].guxFocus();
+    void this.tabTriggers[this.focused].guxFocus();
   }
 
-  setTriggerIds() {
+  private setTabTriggers(): void {
+    this.tabTriggers = this.root.querySelectorAll('gux-tab');
     if (this.tabTriggers) {
       this.triggerIds = Array.from(this.tabTriggers)
         .map(trigger => `gux-${trigger.getAttribute('tab-id')}-tab`)
@@ -141,6 +152,7 @@ export class GuxTabList {
       if (hasVerticalScrollbar !== this.hasVerticalScrollbar) {
         this.hasVerticalScrollbar = hasVerticalScrollbar;
       }
+      this.checkDisabledScrollButtons();
     });
   }
 
@@ -198,14 +210,14 @@ export class GuxTabList {
   }
 
   async componentWillLoad(): Promise<void> {
-    this.tabTriggers = this.root.querySelectorAll('gux-tab');
+    this.setTabTriggers();
     this.i18n = await buildI18nForComponent(this.root, tabsResources);
   }
 
   componentDidLoad() {
     if (!this.resizeObserver && window.ResizeObserver) {
-      this.resizeObserver = new ResizeObserver(
-        this.checkForScrollbarHideOrShow.bind(this)
+      this.resizeObserver = new ResizeObserver(() =>
+        this.checkForScrollbarHideOrShow()
       );
     }
 
@@ -216,8 +228,8 @@ export class GuxTabList {
     }
 
     if (!this.domObserver && window.MutationObserver) {
-      this.domObserver = new MutationObserver(
-        this.checkForScrollbarHideOrShow.bind(this)
+      this.domObserver = new MutationObserver(() =>
+        this.checkForScrollbarHideOrShow()
       );
     }
 
@@ -232,6 +244,23 @@ export class GuxTabList {
     setTimeout(() => {
       this.checkForScrollbarHideOrShow();
     }, 500);
+  }
+
+  checkDisabledScrollButtons() {
+    const scrollContainer = this.root.querySelector('.gux-scrollable-section');
+    if (this.hasHorizontalScrollbar) {
+      const scrollLeft = scrollContainer.scrollLeft;
+      const scrollLeftMax =
+        scrollContainer.scrollWidth - scrollContainer.clientWidth;
+      this.isScrolledToBeginning = scrollLeft === 0;
+      this.isScrolledToEnd = scrollLeftMax - scrollLeft === 0;
+    } else {
+      const scrollTop = scrollContainer.scrollTop;
+      const scrollTopMax =
+        scrollContainer.scrollHeight - scrollContainer.clientHeight;
+      this.isScrolledToBeginning = scrollTop === 0;
+      this.isScrolledToEnd = scrollTopMax - scrollTop === 0;
+    }
   }
 
   scrollLeft() {
@@ -276,7 +305,7 @@ export class GuxTabList {
           ? this.renderScrollButton('scrollRight')
           : this.renderScrollButton('scrollDown')}
       </div>
-    );
+    ) as JSX.Element;
   }
 
   private renderScrollButton(direction: string): JSX.Element {
@@ -284,6 +313,7 @@ export class GuxTabList {
       <div class="gux-scroll-button-container">
         {this.hasHorizontalScrollbar || this.hasVerticalScrollbar ? (
           <button
+            disabled={this.getButtonDisabled(direction)}
             tabindex="-1"
             title={this.i18n(direction)}
             aria-label={this.i18n(direction)}
@@ -297,7 +327,19 @@ export class GuxTabList {
           </button>
         ) : null}
       </div>
-    );
+    ) as JSX.Element;
+  }
+
+  private getButtonDisabled(direction: string): boolean {
+    switch (direction) {
+      case 'scrollLeft':
+      case 'scrollUp':
+        return this.isScrolledToBeginning;
+
+      case 'scrollRight':
+      case 'scrollDown':
+        return this.isScrolledToEnd;
+    }
   }
 
   private getScrollDirection(direction: string): void {
@@ -319,13 +361,13 @@ export class GuxTabList {
   private getChevronIconName(direction: string): string {
     switch (direction) {
       case 'scrollLeft':
-        return 'chevron-left';
+        return 'chevron-small-left';
       case 'scrollRight':
-        return 'chevron-right';
+        return 'chevron-small-right';
       case 'scrollUp':
-        return 'chevron-up';
+        return 'chevron-small-up';
       case 'scrollDown':
-        return 'chevron-down';
+        return 'chevron-small-down';
     }
   }
 }

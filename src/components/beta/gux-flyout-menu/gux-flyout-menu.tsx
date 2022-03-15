@@ -39,7 +39,7 @@ export class GuxFlyoutMenu {
   forceUpdate(isShown: boolean) {
     if (isShown) {
       if (this.popperInstance) {
-        this.popperInstance.update();
+        void this.popperInstance.update();
       }
     }
   }
@@ -57,6 +57,7 @@ export class GuxFlyoutMenu {
           return;
 
         case 'ArrowDown':
+          event.preventDefault();
           this.focusOnMenu();
           return;
 
@@ -98,7 +99,7 @@ export class GuxFlyoutMenu {
   }
 
   @Listen('click')
-  onClick(event) {
+  onClick(event: MouseEvent) {
     if (event.detail !== 0) {
       this.hide();
     }
@@ -164,7 +165,7 @@ export class GuxFlyoutMenu {
     const menuItems = Array.from(menu.children);
     const nextFocusableElement = menuItems[0] as HTMLGuxMenuItemElement;
 
-    nextFocusableElement.guxFocus();
+    void nextFocusableElement.guxFocus();
   }
 
   componentWillLoad(): void {
@@ -205,6 +206,6 @@ export class GuxFlyoutMenu {
           <div class="gux-arrow" data-popper-arrow />
         </div>
       </Host>
-    );
+    ) as JSX.Element;
   }
 }
